@@ -8,16 +8,27 @@ WITH
       tracts15
     WHERE
       state = 17 AND county = 31 AND
-      tract in (410500, 410600, 410700, 410800, 410900, 411000, 411100, 411200, 836200)
+      tract IN (410500, 410600, 410700, 410800, 410900, 411000, 411100, 411200, 836200)
   )
 SELECT the_geom
 FROM ways
 WHERE ST_Intersects(the_geom, (SELECT u FROM w)); 
 
+-- Select all census tracts from Cook County, as a test set.
+SELECT
+  tract id,
+  ST_X(ST_Transform(centroid, 4326)) x,
+  ST_Y(ST_Transform(centroid, 4326)) y,
+  2 dir
+FROM census_tracts_2015
+WHERE
+  state = 17 AND county = 31 AND
+  tract IN (410500, 410600, 410700, 410800, 410900, 411000, 411100, 411200, 836200);
 
 -- Select all of the blocks in this region, coded to their osm_id.
 -- So basically -- shortest paths.
-SELECT DISTINCT ON (state, county, tract, block) 
+SELECT
+  DISTINCT ON (state, county, tract, block) 
   state, county, tract, block, id, osm_id, ST_MakeLine(geom, the_geom)
 FROM 
   block15, ways_vertices_pgr
@@ -26,7 +37,8 @@ WHERE
   tract IN (410500, 410600, 410700, 410800, 410900, 411000, 411100, 411200, 836200) AND
   ST_DWithin(geom, the_geom, 0.01)
 ORDER BY
-  state, county, tract, block, ST_Distance(geom, the_geom)
+  state, county, tract, block,
+  geom <-> the_geom
 ;
 
 

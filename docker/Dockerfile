@@ -13,7 +13,19 @@ RUN apt-get update \
            postgis=$POSTGIS_VERSION \
 			     postgresql-$PG_MAJOR-pgrouting \
 					 vim wget \
-      && rm -rf /var/lib/apt/lists/*
+           git pkg-config build-essential
+
+# osm2pgrouting Requirements
+RUN apt-get install -y  cmake expat libexpat1-dev \
+  libboost-dev libboost-program-options-dev libpqxx-dev
+
+# compile osm2pgrouting
+ENV OSM_2_PGROUTING_VERSION=2.3.3
+RUN git clone https://github.com/pgRouting/osm2pgrouting.git
+RUN cd osm2pgrouting && \
+    git fetch --all && git checkout v${OSM_2_PGROUTING_VERSION} && \
+    cmake -H. -Bbuild && \
+    cd build/ && make && make install
 
 COPY docker-build-and-query.sh \
      start-postgres-db.sh \

@@ -1,4 +1,4 @@
-SELECT count(*) FROM pgr_dijkstraCost('
+SELECT * FROM pgr_dijkstraCost('
   	WITH
   	  w AS (
   	    SELECT
