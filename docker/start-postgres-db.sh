@@ -99,9 +99,7 @@ if [ ! -s "$PGDATA/PG_VERSION" ]; then
 	psql+=( --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" )
 
 	echo
-  echo "${psql[@]}" 
-	for f in /scripts/build/*; do
-    echo $(whoami) $f
+	for f in /scripts/prebuild/*; do
 		case "$f" in
 			*.sh)     echo "$0: running $f"; . "$f" ;;
 			*.sql)    echo "$0: running $f"; "${psql[@]}" -f "$f"; echo ;;

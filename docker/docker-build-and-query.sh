@@ -28,7 +28,7 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 
   # Now run the user scripts.
 	psql+=(psql -U "${POSTGRES_USER:-postgres}" -d "$POSTGRES_DB" )
-	for f in /scripts/run/*; do
+	for f in /scripts/build/* /scripts/run/* ; do
 		case "$f" in
 			*.sh)     echo "Running user script :: $f"; . "$f" ;;
 			*.sql)    echo "Running user script :: $f"; "${psql[@]}" -f "$f"; echo ;;
