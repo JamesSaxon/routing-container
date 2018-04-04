@@ -1,28 +1,34 @@
-SELECT * FROM pgr_dijkstraCost('
-  	WITH
-  	  w AS (
-  	    SELECT
-  	      ST_Buffer(ST_Union(geom), 0.025) u
-  	    FROM
-  	      tracts15
-  	    WHERE
-          state = 17 AND county = 31 AND 
-          centroid && ST_MakeEnvelope(-87.77,41.64,-87.52,42.02)
-  	  )
-  	SELECT
-      gid id, source, target, cost,
-      CASE WHEN reverse_cost < 0 THEN 1e8 ELSE cost END AS reverse_cost
+DROP TABLE IF EXISTS times;
+CREATE TABLE times AS
+SELECT origins.geoid origin, destinations.geoid destination, agg_cost FROM pgr_dijkstraCost('
+    WITH w AS (
+        SELECT ST_Buffer(ST_Envelope(ST_Union(centroid)), 0.025) u 
+        FROM   tracts15
+        WHERE  osm_nn IS NOT NULL
+      )
+    SELECT
+      gid id, source, target, 
+      CASE WHEN cost         < 0 THEN 1e8 ELSE length_m * 6.2e-4 * 60 / default_maxspeed END AS cost,
+      CASE WHEN reverse_cost < 0 THEN 1e8 ELSE length_m * 6.2e-4 * 60 / default_maxspeed END AS reverse_cost
     FROM ways
+    JOIN osm_way_classes ON 
+      ways.class_id = osm_way_classes.class_id
+    WHERE ST_Intersects(the_geom, (SELECT u FROM w))
   ', 
-  ARRAY[279414,249882,255143,260893,162050,86800,169436,195790,170848,281651,259762,244585,235517,220548,254188,247142,
-        57263,94408,82268,49867,78861,29371,38786,1962,20267,21228,62613,46470,69373,76452,74036,32630,32787,7916,20528,
-        210712,146056,162420,144299,148183,155159,163938,233653,145376,261969,234775,264814,237280,267199,211939]::BIGINT[],
-  (SELECT array_agg(nid)
-   FROM block15 
-   WHERE 
-     state = 17 AND county = 31 AND 
-     geom && ST_MakeEnvelope(-87.77,41.64,-87.52,42.02)
-  ), FALSE
-);
-
-
+  (SELECT array_agg(osm_nn) A 
+   FROM tracts15
+   WHERE osm_nn IS NOT NULL 
+   AND state = 17 AND county = 31),
+  (SELECT array_agg(osm_nn) 
+   FROM tracts15
+   WHERE osm_nn IS NOT NULL 
+   AND ST_DWithin(ST_Transform(centroid, 3528),
+                  ST_Transform(ST_SetSRID(ST_MakePoint(-87.60, 41.79),4326), 3528),
+                  50000)
+  ),
+  FALSE
+) 
+JOIN tracts15 origins      ON start_vid = origins.osm_nn
+JOIN tracts15 destinations ON end_vid   = destinations.osm_nn
+ORDER BY origin, destination
+;
