@@ -202,12 +202,10 @@ void Graph::equalize_use(unsigned int cycles) {
 
   for (unsigned int ci = 0; ci < cycles; ci++) {
 
-    int ni = 0;
     for (auto agent : _agents) {
 
       agent->equalize_use();
 
-      ni++;
     }
   }
 
