@@ -12,6 +12,7 @@
 
 
 using std::cout;
+using std::cerr;
 using std::endl;
 using std::map;
 using std::vector;
@@ -175,6 +176,8 @@ void Graph::new_resource(long long id, int demand) {
 
 void Graph::new_edge(long long agent_id, long long resource_id, float cost) {
 
+  if (_addrA.find(agent_id) == _addrA.end()) cerr << agent_id << endl;
+
   assert(_addrA.find(agent_id)    != _addrA.end());
   assert(_addrR.find(resource_id) != _addrR.end());
 
@@ -202,10 +205,12 @@ void Graph::equalize_use(unsigned int cycles) {
 
   for (unsigned int ci = 0; ci < cycles; ci++) {
 
+    int ni = 0;
     for (auto agent : _agents) {
 
       agent->equalize_use();
 
+      ni++;
     }
   }
 

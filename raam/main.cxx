@@ -26,20 +26,24 @@ int main(){
   long long geoid; int doc, pop;
   while(node_csv.read_row(geoid, doc, pop)){
 
-    if (geoid/1000000 != 17031) continue;
+    int state = geoid/1000000000;
+    if (state != 17 && state != 18 && state != 19 && state != 27 && state != 55) continue;
 
     g.new_resource(geoid, doc);
     g.new_agent(geoid, pop);
     g.new_edge(geoid, geoid, 0);
   }
 
-  io::CSVReader<3> edge_csv("data/hp_times.csv");
+  io::CSVReader<3> edge_csv("data/times.csv");
   edge_csv.read_header(io::ignore_extra_column, "origin", "destination", "cost");
   long long geoid1; long long geoid2; float cost;
   while(edge_csv.read_row(geoid1, geoid2, cost)){
 
-    if (geoid1/1000000 != 17031) continue;
-    if (geoid2/1000000 != 17031) continue;
+    int state1 = geoid1/1000000000;
+    int state2 = geoid2/1000000000;
+
+    if (state1 != 17 && state1 != 18 && state1 != 19 && state1 != 27 && state1 != 55) continue;
+    if (state2 != 17 && state2 != 18 && state2 != 19 && state2 != 27 && state2 != 55) continue;
 
     g.new_edge(geoid1, geoid2, cost);
   }
@@ -48,7 +52,7 @@ int main(){
 
   g.write("test_000.csv");
 
-  for (int x = 1; x <= 40; x++) {
+  for (int x = 1; x <= 20; x++) {
     g.equalize_use(1);
     cout << x << endl;
 
