@@ -13,11 +13,13 @@ This solution is based off the standard postgres docker image
 
 https://hub.docker.com/_/postgres/
 
-That image is already a "non-standard" use of docker, and my implementation is even a non-standard use of that.  If you don't understand how the postgres image works, this won't make any sense.  So understand that first..
+That image is already a "non-standard" use of docker, and my implementation is even a weird use of _that_.  If you don't understand how the postgres image works, this won't make any sense.  Understand that first.
 
-This is how it works.  You should load the input and output points into a `scripts/input/chicago_tracts.csv` (I could change the name...).  Each file in that file is an ID,lat,lon,direction.  Direction can be 0, 1, or 2, for outgoing, incoming, or both.  If you pre-download an osm file, you can put that there, as well.  Also create the `scripts/output/` directory.  The completed csv will go there.
+What the scripts do is to build the a routing database completely from scratch, every time, and then run a cost matrix query.  This is designed for lots of different areas of the OSM network, that you you want to run on many different machines.  If you're doing lots of work on one dedicated area, you would modify the Dockerfile to create the database once, and package that (this would reduce your computation costs at the price of the image size).
 
-The folders `prebuild/` and `build/` contain scripts to be run by postgres user and root, respectively.  The former creates the extensions and loads the data in `input`.  The `build/` scripts start by loading the network.  If `inputs/*osm` exists, it will load that.  If it doesn't, it will use `postgres` to buffer the points you just loaded, download an "appopriate" (caveat emptor!  check what OSM ways you want!) osm road network, and load that.  It will then set some default speeds, and do a knn match from your nodes to the OSM nodes.
+The input and output points go in a `scripts/input/chicago_tracts.csv` (I could change the name...).  Each line in that file is an `ID,lat,lon,direction`.  Direction can be 0, 1, or 2, for outgoing, incoming, or both.  If you pre-download an osm file, you can put that there, as well.  Also create the `scripts/output/` directory.  The completed csv will go there.
+
+The folders `prebuild/` and `build/` contain scripts to be run by postgres user and root, respectively.  The former creates the extensions and loads the data in `input`.  The `build/` scripts start by loading the OSM network.  If `inputs/*osm` exists, it will load that.  If it doesn't, it will use `postgres` to buffer the points you just loaded, download an "appopriate" (caveat emptor!  check what OSM ways you want!) osm road network, and load that.  It will then set some default road speeds, and do a knn match from your locations nodes to the OSM nodes.
 
 Finally, `run/01_cost_matrix.sh` runs.  This just uses `pgr_dijkstraCost` to get the answer.  It will write to `scripts/output/cost_matrix.csv`.  So again, make sure `scripts/output/` exists.
 
