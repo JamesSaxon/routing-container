@@ -1,8 +1,36 @@
+## Running it out of the box
 
+
+The gist for the non-dockerized solution is here:
+
+https://gist.github.com/JamesSaxon/94d17a1a603439bd4db59b480e0436bb
+
+As of May 11 2018 it seems fine.  But it breaks regularly, as POSTGIS_VERSION updates.  Check this site when that happens:
+
+https://packages.debian.org/sid/postgresql-10-postgis-2.4
+
+This solution is based off the standard postgres docker image
+
+https://hub.docker.com/_/postgres/
+
+That image is already a "non-standard" use of docker, and my implementation is even a non-standard use of that.  If you don't understand how the postgres image works, this won't make any sense.  So understand that first..
+
+This is how it works.  You should load the input and output points into a `scripts/input/chicago_tracts.csv` (I could change the name...).  Each file in that file is an ID,lat,lon,direction.  Direction can be 0, 1, or 2, for outgoing, incoming, or both.  If you pre-download an osm file, you can put that there, as well.  Also create the `scripts/output/` directory.  The completed csv will go there.
+
+The folders `prebuild/` and `build/` contain scripts to be run by postgres user and root, respectively.  The former creates the extensions and loads the data in `input`.  The `build/` scripts start by loading the network.  If `inputs/*osm` exists, it will load that.  If it doesn't, it will use `postgres` to buffer the points you just loaded, download an "appopriate" (caveat emptor!  check what OSM ways you want!) osm road network, and load that.  It will then set some default speeds, and do a knn match from your nodes to the OSM nodes.
+
+Finally, `run/01_cost_matrix.sh` runs.  This just uses `pgr_dijkstraCost` to get the answer.  It will write to `scripts/output/cost_matrix.csv`.  So again, make sure `scripts/output/` exists.
+
+To build and run you'll do
+```
+git clone https://github.com/JamesSaxon/routing.git
 docker build --no-cache -t route .
+## put all your inputs and outputs in order...  
+docker run --rm -it --name routing-instance -v $(pwd)/scripts/:/scripts  -e POSTGRES_PASSWORD=mysecretpassword route postgres
+```
 
-docker run --rm -it --name routing-instance -v `pwd`:/docker-entrypoint-initdb.d  -e POSTGRES_PASSWORD=mysecretpassword route /bin/bash
 
+## On converting this to singularity
 
 Not clear that I can UNEXPOSE from a higher docker container.  Of course, I can always just _not_ map the port.  See this [thread](https://github.com/moby/moby/issues/3465) on the not-yet-implemented UNEXPOSE/UNSET feature, and EXPOSEd ports in particular.
 
