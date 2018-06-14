@@ -28,6 +28,7 @@ To build and run you'll do
 git clone https://github.com/JamesSaxon/routing.git
 cd routing/docker/
 docker build --no-cache -t route .
+mkdir -p scripts/input scripts/output
 ## put all your inputs and outputs in order...  
 docker run --rm -it --name routing-instance -v $(pwd)/scripts/:/scripts  -e POSTGRES_PASSWORD=mysecretpassword route postgres
 ```
