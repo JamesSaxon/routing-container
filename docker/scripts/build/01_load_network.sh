@@ -3,7 +3,7 @@
 
 if [ -f /scripts/input/*osm ]; then
 
-  sed -i 's/\\//g' *osm
+  sed -i 's/\\//g' /scripts/input/*osm
   osm2pgrouting -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres} -f /scripts/input/*osm
 
 else
@@ -13,7 +13,7 @@ else
 
   wget 'http://overpass-api.de/api/interpreter?data=(way["highway"~"road|motorway|trunk|primary|secondary|tertiary|residential|living_street|unclassified"]('${coords}');>;);out;' -O osm.osm
 
-  sed -i 's/\\//g' *osm
+  sed -i 's/\\//g' /scripts/input/*osm
   osm2pgrouting -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres} -f osm.osm
 
 fi
