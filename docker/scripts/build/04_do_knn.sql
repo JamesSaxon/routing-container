@@ -32,6 +32,6 @@ BEGIN
 END
 $$ LANGUAGE 'plpgsql' STRICT;
 
-SELECT DoKnnMatch(0.001, 0.001, 0.1);
+SELECT DoKnnMatch(0.001, 0.001, 0.5);
 
 
