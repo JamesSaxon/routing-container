@@ -23,7 +23,7 @@ psql -U postgres -t -A -F"," -o /scripts/output/cost_matrix.csv -c "
         ways.tag_id = speeds.tag_id
       WHERE ST_Intersects(the_geom, (SELECT u FROM w))
     ', 
-    (SELECT array_agg(osm_nn) FROM locations WHERE dir != 1),
+    (SELECT array_agg(osm_nn) FROM locations WHERE dir != 1 AND osm_nn IS NOT NULL),
     (SELECT array_agg(osm_nn) FROM locations WHERE dir != 0 AND osm_nn IS NOT NULL),
     FALSE
   ) 
