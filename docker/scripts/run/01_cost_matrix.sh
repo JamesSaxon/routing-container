@@ -24,11 +24,11 @@ psql -U postgres -t -A -F"," -o /scripts/output/cost_matrix.csv -c "
       WHERE ST_Intersects(the_geom, (SELECT u FROM w))
     ', 
     (SELECT array_agg(osm_nn) FROM locations WHERE dir != 1),
-    (SELECT array_agg(osm_nn) FROM locations WHERE dir != 0),
+    (SELECT array_agg(osm_nn) FROM locations WHERE dir != 0 AND osm_nn IS NOT NULL),
     FALSE
   ) 
-  RIGHT OUTER JOIN locations origins      ON start_vid = origins.osm_nn
-  RIGHT OUTER JOIN locations destinations ON end_vid   = destinations.osm_nn
+  LEFT JOIN locations origins      ON start_vid = origins.osm_nn
+  LEFT JOIN locations destinations ON end_vid   = destinations.osm_nn
   ORDER BY origin, destination
   ;
 
