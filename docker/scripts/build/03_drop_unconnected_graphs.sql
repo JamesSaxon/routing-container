@@ -14,13 +14,30 @@ FROM pgr_connectedComponents(
 WHERE a.id = b.node;
 
 DELETE FROM ways_vertices_pgr 
-WHERE component != (
+WHERE component IN (
     SELECT component FROM (
         SELECT DISTINCT ON (component) component, COUNT(*)
         FROM ways_vertices_pgr
         GROUP BY component
         ORDER BY component, COUNT) AS m
-    ORDER BY COUNT DESC LIMIT 1);
+    WHERE COUNT <= 50
+);
+
+WITH county_hull AS (
+    SELECT ST_SetSRID(ST_ConvexHull(ST_Collect(point)), 4326)
+    FROM locations
+    WHERE dir = 2
+)
+DELETE FROM ways_vertices_pgr
+WHERE component NOT IN (
+    SELECT component FROM (
+        SELECT DISTINCT ON (component) component, COUNT(*),
+            ST_SetSRID(ST_ConvexHull(ST_Collect(the_geom)), 4326) AS pgr_hull
+        FROM ways_vertices_pgr
+        GROUP BY component) AS m
+    WHERE ST_Intersects(pgr_hull, (SELECT * FROM county_hull))
+    AND COUNT >= 50
+);
 
 DELETE FROM ways a
 WHERE NOT EXISTS (
