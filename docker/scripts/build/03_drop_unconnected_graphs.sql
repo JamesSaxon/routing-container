@@ -20,7 +20,7 @@ WHERE component IN (
         FROM ways_vertices_pgr
         GROUP BY component
         ORDER BY component, COUNT) AS m
-    WHERE COUNT <= 50
+    WHERE COUNT <= 10
 );
 
 WITH county_hull AS (
