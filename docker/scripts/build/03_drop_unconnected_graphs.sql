@@ -24,7 +24,7 @@ WHERE component IN (
 );
 
 WITH county_hull AS (
-    SELECT ST_SetSRID(ST_ConvexHull(ST_Collect(point)), 4326)
+    SELECT ST_SetSRID(ST_ConvexHull(ST_Collect(point)), 4326) AS hull
     FROM locations
     WHERE dir = 2
 )
@@ -35,7 +35,7 @@ WHERE component NOT IN (
             ST_SetSRID(ST_ConvexHull(ST_Collect(the_geom)), 4326) AS pgr_hull
         FROM ways_vertices_pgr
         GROUP BY component) AS m
-    WHERE ST_Intersects(pgr_hull, (SELECT * FROM county_hull))
+    WHERE ST_Intersects(pgr_hull, (SELECT hull FROM county_hull))
     AND COUNT >= 50
 );
 
