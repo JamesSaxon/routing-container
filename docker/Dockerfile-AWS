@@ -50,8 +50,8 @@ RUN ln -s usr/local/bin/start-postgres-db.sh /
 RUN ln -s usr/local/bin/stop-postgres-db.sh /
 
 ENV AWS_DEFAULT_REGION=us-east-1 \
-    AWS_ACCESS_KEY_ID=my_access_key \
-    AWS_SECRET_ACCESS_KEY=my_secret_access_key \
+    AWS_ACCESS_KEY_ID=XYZ \
+    AWS_SECRET_ACCESS_KEY=XYZ \
     GEOID=17031
 
 ENTRYPOINT ["docker-build-and-query.sh"]
