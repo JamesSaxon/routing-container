@@ -1,6 +1,7 @@
 ALTER TABLE locations ADD COLUMN osm_nn BIGINT;
 
-CREATE OR REPLACE FUNCTION DoKnnMatch(init_tol float8, step_tol float8, max_tol float8)
+DROP FUNCTION IF EXISTS DoKnnMatch;
+CREATE FUNCTION DoKnnMatch(init_tol float8, max_tol float8, factor_tol float8)
 RETURNS float8 AS $$
 DECLARE
   tol float8;
@@ -23,8 +24,9 @@ BEGIN
 					 	 ';
 
     IF tol < max_tol AND EXISTS (SELECT id FROM locations WHERE osm_nn IS NULL) THEN
-			tol := tol + step_tol;
-		ELSE 
+      tol := tol * factor_tol;
+      RAISE NOTICE 'TOLERANCE NOW % and % remain', tol, (SELECT count(*) FROM locations WHERE osm_nn IS NULL);
+    ELSE 
       RETURN tol;
     END IF;
 
@@ -32,6 +34,5 @@ BEGIN
 END
 $$ LANGUAGE 'plpgsql' STRICT;
 
-SELECT DoKnnMatch(0.001, 0.001, 0.2);
-
+SELECT DoKnnMatch(0.001, 0.2, 2);
 

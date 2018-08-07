@@ -4,9 +4,6 @@ psql -U postgres -t -A -F"," -o /scripts/output/cost_matrix.csv -c "
 
   SELECT origins.id origin, destinations.id destination, agg_cost FROM pgr_dijkstraCost('
     	WITH
-        w AS (
-    	    SELECT ST_Buffer(ST_Envelope(ST_Union(point)), 0.025) u 
-    	    FROM   locations),
         speeds AS (
           SELECT 
             tag_id,
@@ -21,7 +18,6 @@ psql -U postgres -t -A -F"," -o /scripts/output/cost_matrix.csv -c "
       FROM ways
       JOIN speeds ON 
         ways.tag_id = speeds.tag_id
-      WHERE ST_Intersects(the_geom, (SELECT u FROM w))
     ', 
     (SELECT array_agg(osm_nn) FROM locations WHERE dir != 1 AND osm_nn IS NOT NULL),
     (SELECT array_agg(osm_nn) FROM locations WHERE dir != 0 AND osm_nn IS NOT NULL),
