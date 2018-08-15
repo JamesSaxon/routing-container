@@ -6,6 +6,13 @@ if [ "${1:0:1}" = '-' ]; then
 	set -- postgres "$@"
 fi
 
+if [ "$1" = 'postgres' ] && [ ! -v $GEOID ]; then
+  s3cmd get s3://jsaxon-routing/osm/${GEOID}.pbf
+  osmium cat ${GEOID}.pbf -f osm -o scripts/input/${GEOID}.osm
+
+  s3cmd get s3://jsaxon-routing/locations/${GEOID}.csv scripts/input/locations.csv
+fi
+
 # allow the container to be started with `--user`
 if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 
@@ -39,6 +46,9 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 	done
 
   gosu postgres /stop-postgres-db.sh 
+
+  s3cmd put scripts/output/cost_matrix.csv s3://jsaxon-routing/output/${GEOID}.csv
+
   exit 0
 
 fi
