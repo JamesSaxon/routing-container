@@ -9,6 +9,12 @@ As of May 11 2018 it seems fine.  But it breaks regularly, as POSTGIS_VERSION up
 
 https://packages.debian.org/sid/postgresql-10-postgis-2.4
 
+You can also run the docker image from before the build fail, to get the right verison number:
+```
+$ docker run --rm -it XXX /bin/bash
+root@XXX:/# apt list -a postgis
+```
+
 This solution is based off the standard postgres docker image
 
 https://hub.docker.com/_/postgres/
