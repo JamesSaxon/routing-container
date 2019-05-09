@@ -2,18 +2,18 @@ FROM postgres:10
 MAINTAINER James Saxon <jsaxon@uchicago.edu>
 
 ENV POSTGIS_MAJOR 2.5
-ENV POSTGIS_VERSION 2.5.0+dfsg-2.pgdg90+1
+ENV POSTGIS_VERSION 2.5.2+dfsg-1~exp1.pgdg90+1
 ENV PGROUTING_MAJOR 2.3
 ENV PGROUTING_VERSION 2.3.0-1
 
-RUN apt-get update \
-      && apt-get install -y --no-install-recommends \
-           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
-           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts=$POSTGIS_VERSION \
-           postgis=$POSTGIS_VERSION \
-			     postgresql-$PG_MAJOR-pgrouting \
-					 vim wget \
-           git pkg-config build-essential
+RUN apt-get update 
+RUN apt-get install -y --no-install-recommends \
+         postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
+         postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts=$POSTGIS_VERSION \
+         postgis=$POSTGIS_VERSION \
+			   postgresql-$PG_MAJOR-pgrouting \
+				 vim wget \
+         git pkg-config build-essential
 
 # osm2pgrouting Requirements
 RUN apt-get install -y  cmake expat libexpat1-dev \
