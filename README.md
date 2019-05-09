@@ -31,8 +31,8 @@ Finally, `run/01_cost_matrix.sh` runs.  This just uses `pgr_dijkstraCost` to get
 
 To build and run you'll do
 ```
-git clone https://github.com/JamesSaxon/routing.git
-cd routing/docker/
+git clone https://github.com/JamesSaxon/routing-container.git
+cd routing-container/
 docker build --no-cache -t route .
 mkdir -p scripts/input scripts/output
 ## put all your inputs and outputs in order...  
