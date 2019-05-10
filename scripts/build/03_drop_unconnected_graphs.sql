@@ -26,7 +26,7 @@ WHERE component IN (
 WITH county_hull AS (
     SELECT ST_SetSRID(ST_ConvexHull(ST_Collect(point)), 4326) AS hull
     FROM locations
-    WHERE dir = 2
+    WHERE (dir % 2) = 0
 )
 DELETE FROM ways_vertices_pgr
 WHERE component NOT IN (
