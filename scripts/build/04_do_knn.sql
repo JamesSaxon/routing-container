@@ -1,4 +1,5 @@
-ALTER TABLE locations ADD COLUMN osm_nn BIGINT;
+ALTER TABLE locations ADD COLUMN osm_nn    BIGINT;
+ALTER TABLE locations ADD COLUMN snap_dist FLOAT;
 
 DROP FUNCTION IF EXISTS DoKnnMatch;
 CREATE FUNCTION DoKnnMatch(init_tol float8, max_tol float8, factor_tol float8)
@@ -10,16 +11,20 @@ BEGIN
   tol := init_tol;
   LOOP
 
-    EXECUTE 'UPDATE locations SET osm_nn = vtx_id FROM (
+    EXECUTE 'UPDATE locations 
+             SET osm_nn = vtx_id,
+                 snap_dist = vtx_dist
+             FROM (
                SELECT DISTINCT ON (loc.id)
-                 loc.id, vtx.id vtx_id
+                 loc.id, vtx.id vtx_id,
+		 ST_Distance(point::geography, the_geom::geography) vtx_dist
                FROM
                  locations loc, ways_vertices_pgr vtx
                WHERE
                  osm_nn IS NULL AND 
                  ST_DWithin(point, the_geom, ' || tol || ')
                ORDER BY
-                 id, point <-> the_geom
+                 id, ST_Distance(point::geography, the_geom::geography)
              ) knn WHERE locations.id = knn.id;
              ';
 
@@ -34,5 +39,5 @@ BEGIN
 END
 $$ LANGUAGE 'plpgsql' STRICT;
 
-SELECT DoKnnMatch(0.001, 0.2, 2);
+SELECT DoKnnMatch(0.0005, 0.2, 2);
 
