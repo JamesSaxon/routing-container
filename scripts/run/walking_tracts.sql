@@ -28,7 +28,7 @@ BEGIN
       (SELECT array_agg(osm_nn) FROM locations 
        WHERE id = r.tract AND dir != 1 AND osm_nn IS NOT NULL),
       (SELECT array_agg(osm_nn) FROM locations
-       WHERE ST_DWithin(point::geography, r.point::geography, 5e3, TRUE) AND 
+       WHERE ST_DWithin(point::geography, r.point::geography, 10e3, TRUE) AND 
              dir != 0 AND osm_nn IS NOT NULL),
       FALSE
 		) 
@@ -36,7 +36,7 @@ BEGIN
 		LEFT JOIN locations destinations ON end_vid   = destinations.osm_nn
 		WHERE origins.id = r.tract AND destinations.dir != 0
 		GROUP BY tract, park
-		HAVING MIN(agg_cost + origins.snap_dist + destinations.snap_dist) < 5e3
+		-- HAVING MIN(agg_cost + origins.snap_dist + destinations.snap_dist) < 5e3
 		ORDER BY tract, total_m ASC
 		;
 
