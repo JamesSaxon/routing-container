@@ -1,10 +1,10 @@
-FROM postgres:10
+FROM postgres:13
 MAINTAINER James Saxon <jsaxon@uchicago.edu>
 
-ENV POSTGIS_MAJOR 2.5
-ENV POSTGIS_VERSION 2.5.2+dfsg-1~exp1.pgdg90+1
-ENV PGROUTING_MAJOR 2.3
-ENV PGROUTING_VERSION 2.3.0-1
+ENV POSTGIS_MAJOR 3
+ENV POSTGIS_VERSION 3.1.1+dfsg-1.pgdg100+1
+ENV PGROUTING_MAJOR 3.1
+ENV PGROUTING_VERSION 3.1.0-2.pgdg100+1
 
 RUN apt-get update 
 RUN apt-get install -y --no-install-recommends \
@@ -19,13 +19,10 @@ RUN apt-get install -y --no-install-recommends \
 RUN apt-get install -y  cmake expat libexpat1-dev \
   libboost-dev libboost-program-options-dev libpqxx-dev
 
-# compile osm2pgrouting
+##  # compile osm2pgrouting
 ENV OSM_2_PGROUTING_VERSION=2.3.3
 RUN git clone https://github.com/pgRouting/osm2pgrouting.git
-RUN cd osm2pgrouting && \
-    git fetch --all && git checkout v${OSM_2_PGROUTING_VERSION} && \
-    cmake -H. -Bbuild && \
-    cd build/ && make && make install
+RUN cd osm2pgrouting && cmake -H. -Bbuild && cd build/ && make && make install
 
 COPY docker-build-and-query.sh \
      start-postgres-db.sh \
