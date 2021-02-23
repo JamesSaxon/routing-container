@@ -12,7 +12,7 @@ RUN apt-get install -y --no-install-recommends \
          postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts=$POSTGIS_VERSION \
          postgis=$POSTGIS_VERSION \
 			   postgresql-$PG_MAJOR-pgrouting \
-				 vim wget \
+				 vim wget osmium-tool \
          git pkg-config build-essential
 
 # osm2pgrouting Requirements
