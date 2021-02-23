@@ -7,9 +7,7 @@ if [ "${1:0:1}" = '-' ]; then
 fi
 
 if [ "$1" = 'postgres' ] && [ ! -v $GEOID ]; then
-  s3cmd get s3://jsaxon-routing/osm/${GEOID}.pbf
-  osmium cat ${GEOID}.pbf -f osm -o scripts/input/${GEOID}.osm
-
+  s3cmd get s3://jsaxon-routing/osm/${GEOID}.pbf scripts/input/${GEOID}.pbf
   s3cmd get s3://jsaxon-routing/locations/${GEOID}.csv scripts/input/locations.csv
 fi
 
@@ -35,7 +33,7 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 
   # Now run the user scripts.
 	psql+=(psql -U "${POSTGRES_USER:-postgres}" -d "$POSTGRES_DB" )
-	for f in /scripts/build/* /scripts/run/01_cost_matrix.sh ; do
+	for f in /scripts/build/* /scripts/run/driving*sql ; do
 		case "$f" in
 			*.sh)     echo "Running user script :: $f"; . "$f" ;;
 			*.sql)    echo "Running user script :: $f"; "${psql[@]}" -f "$f"; echo ;;
