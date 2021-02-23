@@ -8,4 +8,5 @@ export PGUSER=postgres
 psql --dbname="$POSTGRES_DB" <<EOSQL
 CREATE EXTENSION postgis;
 CREATE EXTENSION pgrouting;
+CREATE EXTENSION hstore;
 EOSQL
