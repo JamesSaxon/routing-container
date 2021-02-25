@@ -33,7 +33,7 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 
   # Now run the user scripts.
 	psql+=(psql -U "${POSTGRES_USER:-postgres}" -d "$POSTGRES_DB" )
-	for f in /scripts/build/* /scripts/run/driving*sql ; do
+	for f in /scripts/build/* ; do
 		case "$f" in
 			*.sh)     echo "Running user script :: $f"; . "$f" ;;
 			*.sql)    echo "Running user script :: $f"; "${psql[@]}" -f "$f"; echo ;;
@@ -43,7 +43,7 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 		echo
 	done
 
-  gosu postgres /stop-postgres-db.sh 
+  # gosu postgres /stop-postgres-db.sh 
 
 
   if [ ! -v $GEOID ]; then

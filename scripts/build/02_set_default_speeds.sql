@@ -82,3 +82,18 @@ UPDATE configuration SET maxspeed_rural = CASE
   END;
 
 
+ALTER TABLE ways_vertices_pgr ADD COLUMN hway BOOLEAN DEFAULT(FALSE);
+
+UPDATE ways_vertices_pgr
+SET hway = TRUE
+FROM ways 
+JOIN configuration ON 
+  configuration.tag_id = ways.tag_id
+WHERE
+  (ways.source_osm = ways_vertices_pgr.osm_id OR
+   ways.target_osm = ways_vertices_pgr.osm_id) AND
+  configuration.tag_value IN ('motorway', 'motorway_junction', 'motorway_link', 'trunk', 'trunk_link')
+;
+
+
+

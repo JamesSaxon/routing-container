@@ -1,20 +1,3 @@
-ALTER TABLE locations ADD COLUMN osm_nn    BIGINT;
-ALTER TABLE locations ADD COLUMN snap_dist FLOAT;
-
-ALTER TABLE ways_vertices_pgr ADD COLUMN hway BOOLEAN DEFAULT(FALSE);
-
-UPDATE ways_vertices_pgr
-SET hway = TRUE
-FROM ways 
-JOIN configuration ON 
-  configuration.tag_id = ways.tag_id
-WHERE
-  (ways.source_osm = ways_vertices_pgr.osm_id OR
-   ways.target_osm = ways_vertices_pgr.osm_id) AND
-  configuration.tag_value IN ('motorway', 'motorway_junction', 'motorway_link', 'trunk', 'trunk_link')
-;
-
-DROP FUNCTION IF EXISTS DoKnnMatch;
 CREATE FUNCTION DoKnnMatch(init_tol float8, max_tol float8, factor_tol float8)
 RETURNS float8 AS $$
 DECLARE
@@ -51,6 +34,4 @@ BEGIN
   END LOOP;
 END
 $$ LANGUAGE 'plpgsql' STRICT;
-
-SELECT DoKnnMatch(0.0005, 0.2, 2);
 

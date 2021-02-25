@@ -23,20 +23,15 @@ WHERE component IN (
     WHERE COUNT <= 10
 );
 
-WITH county_hull AS (
-    SELECT ST_SetSRID(ST_ConvexHull(ST_Collect(point)), 4326) AS hull
-    FROM locations
-    WHERE (dir % 2) = 0
-)
 DELETE FROM ways_vertices_pgr
 WHERE component NOT IN (
-    SELECT component FROM (
+    SELECT component FROM region, (
         SELECT DISTINCT ON (component) component, COUNT(*),
             ST_SetSRID(ST_ConvexHull(ST_Collect(the_geom)), 4326) AS pgr_hull
         FROM ways_vertices_pgr
         GROUP BY component) AS m
-    WHERE ST_Intersects(pgr_hull, (SELECT hull FROM county_hull))
-    AND COUNT >= 50
+    WHERE ST_Intersects(pgr_hull, region.geometry)
+    AND COUNT >= 100
 );
 
 DELETE FROM ways a
