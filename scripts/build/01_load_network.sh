@@ -16,4 +16,6 @@ fi
 
 osm2pgrouting -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres} -f /scripts/input/*osm -c /scripts/input/mapconfig.xml --addnodes --clean --no-index
 
+psql -U postgres -c 'CREATE INDEX ON ways_vertices_pgr USING GIST ("the_geom");'
+
 
