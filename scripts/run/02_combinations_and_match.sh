@@ -1,14 +1,14 @@
 #!/bin/bash 
 
-if test -f scripts/input/combinations.csv ; then
+if test -f ./user_data/combinations.csv ; then
 
 echo loading combinations knn matches.
 
-psql -U postgres --dbname="$POSTGRES_DB" <<EOSQL
+psql -U postgres -d postgres -p 5432 -h localhost <<EOSQL
 
 DROP TABLE IF EXISTS combinations;
 CREATE TABLE combinations (idxA TEXT, idxB TEXT);
-\\copy combinations FROM 'scripts/input/combinations.csv' CSV;
+\\copy combinations FROM './user_data/combinations.csv' CSV;
 
 ALTER TABLE combinations ADD COLUMN source BIGINT;
 ALTER TABLE combinations ADD COLUMN target BIGINT;

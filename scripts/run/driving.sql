@@ -17,6 +17,6 @@ JOIN combinations c ON
   start_vid = c.source AND end_vid = c.target 
 JOIN ways w ON a.edge = w.gid
 ORDER BY idxa, idxb, path_seq
-\g '/scripts/output/paths.csv'
+\g './user_data/paths.csv'
 
 
