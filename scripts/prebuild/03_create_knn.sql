@@ -1,3 +1,4 @@
+DROP FUNCTION IF EXISTS DoKnnMatch;
 CREATE FUNCTION DoKnnMatch(init_tol float8, max_tol float8, factor_tol float8)
 RETURNS float8 AS $$
 DECLARE
@@ -13,8 +14,7 @@ BEGIN
              FROM (
                SELECT DISTINCT ON (loc.id)
                  loc.id, vtx.id vtx_id,
-		             -- ST_Distance(point::geography, vtx.the_geom::geography) vtx_dist
-                 point <-> vtx.the_geom AS vtx_dist
+		             ST_Distance(point::geography, vtx.the_geom::geography) vtx_dist 
                FROM
                  locations loc, ways_vertices_pgr vtx
 	             WHERE 
