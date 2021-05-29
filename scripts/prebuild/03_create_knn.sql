@@ -18,7 +18,8 @@ BEGIN
                FROM
                  locations loc, ways_vertices_pgr vtx
 	             WHERE 
-                 NOT vtx.hway AND osm_nn IS NULL AND 
+                 -- NOT vtx.hway AND 
+                 osm_nn IS NULL AND 
                  ST_DWithin(point, vtx.the_geom, ' || tol || ')
                ORDER BY
                  id, ST_Distance(point::geography, vtx.the_geom::geography)

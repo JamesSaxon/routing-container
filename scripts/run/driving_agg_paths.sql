@@ -12,19 +12,19 @@ SELECT json_build_object(
   'features', json_agg(
     json_build_object(
       'type',       'Feature',
-      'id',         idxa, -- the GeoJson spec includes an 'id' field, but it is optional, replace {id} with your id field
+      'id',         osm_id, -- the GeoJson spec includes an 'id' field, but it is optional, replace {id} with your id field
       'geometry',   ST_AsGeoJSON(ST_Transform(path, 4326))::json,
       'properties', json_build_object(
           -- list of fields
-          'idxa',   idxa,
-          'idxb',   idxb,
-          'length', ST_Length(ST_Transform(path, 2163))
+          'osm_id',   osm_id,
+          'length', ST_Length(ST_Transform(path, 3528)),
+          'n', n
       )
     )
   )
 ) 
 FROM (
-  SELECT idxa, idxb, ST_LineMerge(ST_Union(w.the_geom)) path
+  SELECT w.osm_id, COUNT(*) n, w.the_geom path
   FROM pgr_dijkstra('
   
     SELECT
@@ -41,9 +41,7 @@ FROM (
   JOIN combinations c ON
     start_vid = c.source AND end_vid = c.target 
   JOIN ways w ON a.edge = w.gid
-  GROUP BY idxa, idxb
-  ORDER BY idxa, idxb
-    
+  GROUP BY w.the_geom, w.osm_id
 ) q
 \g './user_data/paths.geojson'
 

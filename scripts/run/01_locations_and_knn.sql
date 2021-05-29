@@ -10,5 +10,5 @@ CREATE INDEX ON locations USING GIST ("point");
 ALTER TABLE locations ADD COLUMN osm_nn    BIGINT;
 ALTER TABLE locations ADD COLUMN snap_dist FLOAT;
 
-SELECT DoKnnMatch(0.0005, 0.2, 2);
+SELECT DoKnnMatch(0.0005, 0.01, 2);
 
